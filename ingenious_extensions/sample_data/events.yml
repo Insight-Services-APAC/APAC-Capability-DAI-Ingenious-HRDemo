@@ -1,0 +1,13 @@
+- identifier: '01'
+  event_type: default
+  file_name: cv_senior_data_specialist_suitable.json
+  response_content: no response generated
+  conversation_flow: "hr_insights"
+  identifier_group: "week1"
+- identifier: '02'
+  event_type: default
+  file_name: cv_senior_data_specialist_notsuitable.json
+  response_content: no response generated
+  conversation_flow: "hr_insights"
+  identifier_group: "week1"
+
