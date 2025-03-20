@@ -52,6 +52,8 @@ from ingenious.models.message import Message as ChatHistoryMessage
 # Custom class import from ingenious_extensions
 from ingenious_extensions.models.agent import ProjectAgents
 from ingenious_extensions.models.applicant import RootModel
+import ingenious.config.config as ig_config
+from ingenious.files.files_repository import FileStorage
 
 
 def inject_criteria (template, key,injectValue):
@@ -62,6 +64,17 @@ def inject_criteria (template, key,injectValue):
     text = re.sub(pattern, injectValue, template,0, flags=re.IGNORECASE)
     return text
 
+async def Get_Criteria(config, revision_id: str = None, file_name: str = "criteria.json"):       
+    fs = FileStorage(config)
+    template_path = await fs.get_data_path(revision_id)
+    content = await fs.read_file(file_name=file_name, file_path=template_path)
+    if content is None:
+        print(f"Criteria file {file_name} not found in {template_path}")
+        return ""
+    env = Environment()
+    template = env.from_string(content)
+    return template.render()
+
 class ConversationFlow(IConversationFlow):
     async def get_conversation_response(
         self,
@@ -69,8 +82,8 @@ class ConversationFlow(IConversationFlow):
     ) -> ChatResponse:
         
         message = json.loads(chat_request.user_prompt)
-        criteria_type = chat_request.event_type
-        print(criteria_type)
+        # criteria_type = chat_request.event_type
+        # print(criteria_type)
       
         #  Get your agents and agent chats from your custom class in models folder
         project_agents = ProjectAgents()
@@ -111,17 +124,15 @@ class ConversationFlow(IConversationFlow):
             # )
         
         # Handle different event types
-        if criteria_type == "default":
-            criteria_filename = 'data_specialist_jobdef.json'
-        elif criteria_type == "clinical_nurse":
-            criteria_filename = 'clinical_nurse_jobdef.json'
-        elif criteria_type == "rail_safety_officer":
-            criteria_filename = 'rail_safety_officer_jobdef.json'
-        else:
-           criteria_filename = ""
-
-        with open(f'.files/functional_test_outputs/{revision_id}/{criteria_filename}', 'rb') as json_file:
-            criteria  = json.load(json_file)
+        # if criteria_type == "default":
+        #     criteria_filename = 'data_specialist_jobdef.json'
+        # elif criteria_type == "clinical_nurse":
+        #     criteria_filename = 'clinical_nurse_jobdef.json'
+        # elif criteria_type == "rail_safety_officer":
+        #     criteria_filename = 'rail_safety_officer_jobdef.json'
+        # else:
+        criteria_filename = "job_criteria.json"
+        criteria = await Get_Criteria(ig_config.get_config(), revision_id=revision_id, file_name=criteria_filename)
         #print(criteria)
 
         # Now add your system prompts to your agents from the prompt templates

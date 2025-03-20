@@ -25,7 +25,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Use pip to install the `ingenious` package from the GitHub repository
-RUN pip install git+https://github.com/Insight-Services-APAC/Insight_Ingenious.git#egg=ingenious --force-reinstall
+#RUN pip install git+https://github.com/Insight-Services-APAC/Insight_Ingenious.git#egg=ingenious --force-reinstall
+RUN pip install git+https://github.com/Insight-Services-APAC/Insight_Ingenious.git@v0.0.10 --force-reinstall
 
 # Copy the application files into the container
 COPY ./ingenious_extensions /ingen_app/ingenious_extensions
@@ -33,3 +34,4 @@ COPY ./tmp /ingen_app/tmp
 
 # Set the command to run the app
 CMD ["ingen_cli", "run-rest-api-server"]
+#CMD ["ingen_cli" ,"run-prompt-tuner"]
